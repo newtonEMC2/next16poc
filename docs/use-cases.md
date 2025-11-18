@@ -17,6 +17,7 @@ We make real http calls
 * Layouts (`app/layout.tsx`)
 * Metadata (`metadata.ts`)
 * `next/image` for optimized images
+* `cacheComponents` for featured products and hero banners
 
 ---
 
@@ -26,10 +27,11 @@ We make real http calls
 **Concepts Practiced:**
 
 * Dynamic routes (`app/products/[id]/page.tsx`)
-* Incremental Static Regeneration (ISR) with `revalidate`
+* Incremental Static Regeneration (ISR) with `revalidate` or `cacheComponents`
 * Fetching product data on the server
 * Nested layouts for product sections
 * Error handling (`error.tsx`) for out-of-stock or missing products
+* `cacheComponents` for product list and product card components
 
 ---
 
@@ -43,6 +45,7 @@ We make real http calls
 * React Server Components with async fetch
 * Loading UI (`loading.tsx`) while data streams in
 * Client-side rendering for interactive sales charts and analytics
+* `cacheComponents` for non-critical stats and visualizations
 
 ---
 
@@ -52,7 +55,7 @@ We make real http calls
 **Concepts Practiced:**
 
 * Client-side data fetching (SWR or React Query) for order updates
-* Caching strategies (`cache: 'no-store'` vs `'force-cache'`)
+* Caching strategies (`cache: 'no-store'` for sensitive data)
 * Form handling for profile updates and address management
 * Optimistic updates for wishlist and cart actions
 
@@ -67,6 +70,7 @@ We make real http calls
 * Edge functions with `runtime: 'edge'` for cart operations
 * Middleware for authentication, rate limiting, and session management
 * Response caching and headers for product data
+* `cacheComponents` not used here—use edge cache and headers
 
 ---
 
@@ -78,6 +82,7 @@ We make real http calls
 * Server Actions for filtering product data
 * Client + Server rendering combo (RSC + CSR) for instant feedback
 * Suspense boundaries for search results loading states
+* `cacheComponents` for frequently queried but static results
 
 ---
 
@@ -100,6 +105,7 @@ We make real http calls
 * Streaming product recommendations to the client
 * React Suspense with async server components for reviews
 * Partial hydration for interactive product galleries
+* `cacheComponents` for async recommendations that don’t change per user
 
 ---
 
@@ -111,6 +117,7 @@ We make real http calls
 * Real-time order status updates
 * Background revalidation for inventory
 * PWA setup for offline cart and wishlist caching
+* `cacheComponents` for non-user-specific reusable components
 
 ---
 
@@ -122,30 +129,30 @@ Start from **1 → 2 → 3 → 4 → 5**, then tackle advanced features like **s
 
 ## Optional Visual Roadmap Table
 
-| Step | Use Case            | Rendering Type | Caching Strategy  | Key Features                                   |
-| ---- | ------------------- | -------------- | ----------------- | ---------------------------------------------- |
-| 1    | Landing Page        | SSG            | Force Cache       | Layouts, Metadata, Images                      |
-| 2    | Product Catalog     | SSG + ISR      | Revalidate        | Dynamic routes, Nested layouts, Error handling |
-| 3    | Admin Dashboard     | SSR            | No-store / SWR    | Protected routes, Async RSC, Loading states    |
-| 4    | User Account        | CSR            | Client cache      | Forms, Mutations, Optimistic updates           |
-| 5    | API & Edge          | Server / Edge  | Edge cache        | API routes, Middleware, Auth                   |
-| 6    | Product Search      | SSR + CSR      | SWR / cache       | Filters, Suspense boundaries                   |
-| 7    | Errors              | SSR/CSR        | N/A               | 404/500 pages, notFound(), redirect()          |
-| 8    | Streaming           | SSR streaming  | Partial hydration | Async recommendations, Suspense                |
-| 9    | Misc                | SSR/CSR        | Background cache  | Real-time updates, PWA                         |
+| Step | Use Case        | Rendering Type | Caching Strategy                      | Key Features                                   |
+| ---- | --------------- | -------------- | ------------------------------------- | ---------------------------------------------- |
+| 1    | Landing Page    | SSG            | `cacheComponents`                     | Layouts, Metadata, Images                      |
+| 2    | Product Catalog | SSG + ISR      | `cacheComponents`                     | Dynamic routes, Nested layouts, Error handling |
+| 3    | Admin Dashboard | SSR            | `cacheComponents` / SWR               | Protected routes, Async RSC, Loading states    |
+| 4    | User Account    | CSR            | `no-store` / client cache             | Forms, Mutations, Optimistic updates           |
+| 5    | API & Edge      | Server / Edge  | Edge cache / headers                  | API routes, Middleware, Auth                   |
+| 6    | Product Search  | SSR + CSR      | `cacheComponents` / SWR               | Filters, Suspense boundaries                   |
+| 7    | Errors          | SSR/CSR        | N/A                                   | 404/500 pages, notFound(), redirect()          |
+| 8    | Streaming       | SSR streaming  | Partial hydration / `cacheComponents` | Async recommendations, Suspense                |
+| 9    | Misc            | SSR/CSR        | Background cache / `cacheComponents`  | Real-time updates, PWA                         |
 
 ---
 
 ## Tech Stack
 
-- **Framework:** Next.js 16 (App Router)
-- **Language:** TypeScript
-- **Styling:** CSS Modules
-- **State Management:** React Server Components + Client Components
-- **Data Fetching:** Server-side fetch, SWR, React Query
-- **Payment:** Stripe integration (planned)
-- **Deployment:** Vercel
+* **Framework:** Next.js 16 (App Router)
+* **Language:** TypeScript
+* **Styling:** CSS Modules
+* **State Management:** React Server Components + Client Components
+* **Data Fetching:** Server-side fetch, SWR, React Query
+* **Payment:** Stripe integration (planned)
+* **Deployment:** Vercel
 
 ---
 
-This document serves as a step-by-step checklist for building ShopFlow, a production-ready e-commerce platform with Next.js 16.
+This document serves as a step-by-step checklist for building ShopFlow, a production-ready e-commerce platform with Next.js 16 and `cacheComponents`.
