@@ -87,6 +87,8 @@
   transition: all 0.3s ease;
   border: 2px solid transparent;
   min-width: 160px;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .primaryBtn {
@@ -154,6 +156,9 @@
   cursor: pointer;
   position: relative;
   border: 1px solid var(--border-color);
+  text-decoration: none;
+  color: inherit;
+  display: block;
 }
 
 .productCard:hover {
@@ -272,6 +277,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  display: inline-block;
 }
 
 .viewBtn:hover {
@@ -296,6 +302,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .viewAllBtn:hover {

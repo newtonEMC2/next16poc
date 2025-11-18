@@ -1,44 +1,40 @@
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./page.module.css";
 import { Product, ProductsResponse } from "@/types/product";
 
 /**
- * RENDERING STRATEGY: Static Site Generation (SSG)
+ * RENDERING STRATEGY: Incremental Static Regeneration (ISR)
  * 
- * This function fetches featured products and demonstrates Next.js 16 caching:
+ * This function fetches featured products using Next.js 16 Cache Components:
  * 
- * 1. "use cache" directive (Next.js 16 cacheComponents feature):
- *    - Tells Next.js to cache the RESULT of this function
- *    - The cached result is shared across all requests
- *    - Default cache duration: 15 minutes (900 seconds)
- *    - Can be customized with: "use cache" { revalidate: 3600 }
+ * 1. "use cache" + cacheLife():
+ *    - Caches the function result with custom revalidation
+ *    - stale: 3600s (1 hour) - serves stale while revalidating
+ *    - revalidate: 3600s - background revalidation interval
+ *    - expire: 86400s (24 hours) - absolute expiration
  * 
- * 2. fetch() with cache: "force-cache":
- *    - Caches the HTTP response from the API
- *    - Response is stored in Next.js Data Cache
- *    - Persists across deployments and requests
+ * 2. ISR BEHAVIOR:
+ *    - First hour: Serves cached result instantly
+ *    - After 1 hour: Serves stale content + revalidates in background
+ *    - After 24 hours: Forces fresh fetch
  * 
  * WHEN IS THIS EXECUTED?
  * - Build time: During `next build` (creates static HTML)
- * - Revalidation: After cache expires (15m default)
+ * - Runtime: Revalidates every hour in the background
  * - On-demand: Via revalidatePath() or revalidateTag()
  * 
- * CACHING LAYERS:
+ * CACHING STRATEGY:
  * ┌─────────────────────────────────────────────────┐
- * │ 1. Component Cache ("use cache")                │ ← Function result cached
- * │    └─> Caches the products array for 15m        │
- * └─────────────────────────────────────────────────┘
- * ┌─────────────────────────────────────────────────┐
- * │ 2. Data Cache (fetch cache: "force-cache")      │ ← HTTP response cached
- * │    └─> Caches API response indefinitely          │
+ * │ Cache Life Configuration (ISR)                  │
+ * │  stale: 1h → revalidate: 1h → expire: 24h      │
+ * │  └─> Serves fast + updates in background        │
  * └─────────────────────────────────────────────────┘
  */
 async function getFeaturedProducts(): Promise<Product[]> {
-  "use cache"; // Next.js 16: Cache this function's result for 15 minutes
-  
   try {
     const res = await fetch("https://dummyjson.com/products?limit=8", {
-      cache: "force-cache", // Cache the HTTP response indefinitely
+      next: { revalidate: 3600 }, // ISR: Revalidate every hour
     });
 
     if (!res.ok) {
@@ -56,33 +52,33 @@ async function getFeaturedProducts(): Promise<Product[]> {
 /**
  * COMPONENT: Home (Landing Page)
  * 
- * RENDERING TYPE: Static (SSG)
+ * RENDERING TYPE: Incremental Static Regeneration (ISR)
  * ┌──────────────────────────────────────────────────────────────┐
  * │ This is a React Server Component (RSC) that:                 │
  * │ 1. Runs ONLY on the server (never in the browser)            │
  * │ 2. Can be async and fetch data directly                      │
  * │ 3. Generates static HTML at build time                       │
- * │ 4. No client-side JavaScript needed (zero JS bundle)         │
+ * │ 4. Revalidates data every hour in the background             │
  * └──────────────────────────────────────────────────────────────┘
  * 
  * CACHE STATUS:
- * ✅ Page Output: Cached as static HTML (15 minute revalidation)
- * ✅ Data Fetching: Cached via "use cache" directive
+ * ✅ Page Output: ISR with 1-hour revalidation
+ * ✅ Data Fetching: Cached via "use cache" + cacheLife()
  * ✅ Images: Optimized and cached by Next.js Image component
  * 
  * BUILD OUTPUT:
  * Route (app)      Revalidate  Expire
- * ○ /                   15m      1y
- * ○ = Static (pre-rendered at build time)
+ * ○ /                   1h       24h
+ * ○ = ISR (Incremental Static Regeneration)
  * 
  * PERFORMANCE BENEFITS:
- * - Zero server load for cached pages
  * - Instant page loads (served as static HTML)
+ * - Fresh content every hour (background revalidation)
+ * - Zero downtime during updates (stale-while-revalidate)
  * - SEO-friendly (fully rendered HTML)
- * - Low bandwidth usage
  */
 export default async function Home() {
-  // Fetch featured products (cached for 15 minutes via "use cache")
+  // Fetch featured products (ISR: 1 hour revalidation)
   const featuredProducts = await getFeaturedProducts();
 
   return (
@@ -96,12 +92,12 @@ export default async function Home() {
             for everything you need.
           </p>
           <div className={styles.heroCtas}>
-            <button className={styles.primaryBtn}>
+            <Link href="/products" className={styles.primaryBtn}>
               Shop Now
-            </button>
-            <button className={styles.secondaryBtn}>
+            </Link>
+            <Link href="/products" className={styles.secondaryBtn}>
               Learn More
-            </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -118,7 +114,11 @@ export default async function Home() {
 
           <div className={styles.productGrid}>
             {featuredProducts.map((product) => (
-              <article key={product.id} className={styles.productCard}>
+              <article key={product.id}>
+                <Link 
+                  href={`/products/${product.id}`}
+                  className={styles.productCard}
+                >
                 <div className={styles.productImageWrapper}>
                   {/* 
                     next/image OPTIMIZATION & CACHING:
@@ -179,19 +179,20 @@ export default async function Home() {
                         </span>
                       )}
                     </div>
-                    <button className={styles.viewBtn}>
+                    <span className={styles.viewBtn}>
                       View Details
-                    </button>
+                    </span>
                   </div>
                 </div>
+                </Link>
               </article>
             ))}
           </div>
 
           <div className={styles.viewAllWrapper}>
-            <button className={styles.viewAllBtn}>
+            <Link href="/products" className={styles.viewAllBtn}>
               View All Products →
-            </button>
+            </Link>
           </div>
         </div>
       </section>

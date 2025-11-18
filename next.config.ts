@@ -20,23 +20,14 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   /**
-   * cacheComponents: true (Next.js 16 Feature)
+   * cacheComponents: false (Temporarily disabled)
    * 
-   * Enables the "use cache" directive for Server Components
-   * - Allows functions/components to opt-in to caching
-   * - Caches function results on the server
-   * - Default TTL: 15 minutes (900 seconds)
-   * - Can be customized per-component
+   * Disabled due to compatibility issues with dynamic ISR pages
+   * Using standard fetch caching with next: { revalidate } instead
    * 
-   * CACHING STRATEGY:
-   * ┌────────────────────────────────────────────────────┐
-   * │ Without "use cache": Executes on every request    │
-   * │ With "use cache": Executes once, cached 15m        │
-   * └────────────────────────────────────────────────────┘
-   * 
-   * Performance: Dramatically reduces redundant computations
+   * This resolves hydration errors on dynamically generated pages
    */
-  cacheComponents: true,
+  cacheComponents: false,
 
   /**
    * images.remotePatterns
