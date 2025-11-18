@@ -1,8 +1,77 @@
 import type { NextConfig } from "next";
 
+/**
+ * NEXT.JS 16 CONFIGURATION
+ * 
+ * This file configures Next.js build-time and runtime behavior
+ */
 const nextConfig: NextConfig = {
-  /* config options here */
+  /**
+   * reactCompiler: true
+   * 
+   * Enables the React Compiler (React 19+)
+   * - Automatically optimizes React components
+   * - Memoizes components and hooks automatically
+   * - Reduces need for useMemo, useCallback, React.memo
+   * - Better performance with less manual optimization
+   * 
+   * Build Impact: Slightly longer build times, faster runtime
+   */
   reactCompiler: true,
+
+  /**
+   * cacheComponents: true (Next.js 16 Feature)
+   * 
+   * Enables the "use cache" directive for Server Components
+   * - Allows functions/components to opt-in to caching
+   * - Caches function results on the server
+   * - Default TTL: 15 minutes (900 seconds)
+   * - Can be customized per-component
+   * 
+   * CACHING STRATEGY:
+   * ┌────────────────────────────────────────────────────┐
+   * │ Without "use cache": Executes on every request    │
+   * │ With "use cache": Executes once, cached 15m        │
+   * └────────────────────────────────────────────────────┘
+   * 
+   * Performance: Dramatically reduces redundant computations
+   */
+  cacheComponents: true,
+
+  /**
+   * images.remotePatterns
+   * 
+   * Configures which external image domains are allowed
+   * Required for next/image to optimize external images
+   * 
+   * SECURITY: Prevents arbitrary image URLs from being optimized
+   * PERFORMANCE: Enables automatic image optimization for these domains
+   * 
+   * Image Optimization includes:
+   * - Format conversion (WebP/AVIF)
+   * - Responsive sizing
+   * - Quality compression
+   * - Lazy loading
+   * 
+   * CACHING:
+   * - Optimized images cached on CDN (Vercel)
+   * - Browser cache: ~1 year
+   * - Immutable cache headers
+   */
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.dummyjson.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "dummyjson.com",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
