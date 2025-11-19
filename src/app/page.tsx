@@ -95,6 +95,9 @@ export default async function Home() {
             <Link href="/products" className={styles.primaryBtn}>
               Shop Now
             </Link>
+            <Link href="/bargains" className={styles.primaryBtn}>
+              Bargains
+            </Link>
             <Link href="/about" className={styles.secondaryBtn}>
               Learn More
             </Link>
