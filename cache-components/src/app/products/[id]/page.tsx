@@ -3,29 +3,37 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import styles from "./product-detail.module.css";
 import { Product } from "@/types/product";
+import { cacheLife } from "next/cache";
 
 /**
- * RENDERING STRATEGY: Static Site Generation (SSG) + Incremental Static Regeneration (ISR)
+ * RENDERING STRATEGY: Cache Components with SSG + On-Demand Caching
  * 
- * This page demonstrates Next.js static generation with ISR:
+ * This page demonstrates Next.js Cache Components approach:
  * 
  * 1. SSG (Static Site Generation):
  *    - Products 1 and 2 are pre-generated at build time
- *    - Generated via generateStaticParams()
+ *    - Generated via generateStaticParams() - these params become static
  * 
- * 2. ISR (Incremental Static Regeneration):
- *    - All other products are generated on-demand (first request)
- *    - All pages revalidate every 1 hour (3600 seconds)
- *    - Stale content served while regenerating in background
+ * 2. On-Demand Caching:
+ *    - ANY product ID that gets fetched is cached
+ *    - Cached data persists across requests (no time-based revalidation)
+ *    - Implemented using 'use cache' directive
+ *    - Other products generated on-demand on first visit, then cached
+ * 
+ * 3. Cache Components Benefits:
+ *    - Fine-grained caching control at function level
+ *    - Dynamic by default, opt-in to caching
+ *    - Cache once, serve many times
+ *    - Works with any data source (not just fetch)
  * 
  * BUILD BEHAVIOR:
  * - Build time: Generates static HTML for products 1 and 2
  * - Runtime: On-demand generation for other products
- * - After 1 hour: Background revalidation for all pages
+ * - Cache: Once fetched, cached indefinitely until manual revalidation
  * 
  * PERFORMANCE:
- * - Instant page loads (fully static)
- * - No dynamic rendering overhead
+ * - Instant page loads for all visited products
+ * - No repeated API calls for same product
  * - SEO-friendly (fully rendered HTML)
  */
 
@@ -37,13 +45,14 @@ interface ProductDetailPageProps {
 
 /**
  * Fetches a single product by ID
- * ISR: Cached with 1-hour revalidation
+ * Cache Components: Uses 'use cache' - caches indefinitely once fetched
  */
 async function getProduct(id: string): Promise<Product | null> {
+  "use cache";
+  cacheLife("hours");
+  
   try {
-    const res = await fetch(`https://dummyjson.com/products/${id}`, {
-      next: { revalidate: 30 }, // ISR: Revalidate every hour
-    });
+    const res = await fetch(`https://dummyjson.com/products/${id}`);
 
     if (!res.ok) {
       if (res.status === 404) {
@@ -62,19 +71,19 @@ async function getProduct(id: string): Promise<Product | null> {
 
 /**
  * Fetches related products from the same category
- * ISR: Cached with 1-hour revalidation
+ * Cache Components: Uses 'use cache' - caches indefinitely once fetched
  */
 async function getRelatedProducts(
   category: string,
   currentId: number,
   limit: number = 4
 ): Promise<Product[]> {
+  "use cache";
+  cacheLife("hours");
+
   try {
     const res = await fetch(
-      `https://dummyjson.com/products/category/${category}?limit=10`,
-      {
-        next: { revalidate: 30 }, // ISR: Revalidate every hour
-      }
+      `https://dummyjson.com/products/category/${category}?limit=10`
     );
 
     if (!res.ok) {

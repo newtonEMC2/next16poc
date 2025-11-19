@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
    * 
    * This resolves hydration errors on dynamically generated pages
    */
-  cacheComponents: false,
+  cacheComponents: true,
 
   /**
    * images.remotePatterns
