@@ -3,33 +3,30 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import styles from "./product-detail.module.css";
 import { Product } from "@/types/product";
-import { Suspense } from "react";
-import { unstable_noStore } from "next/cache";
 
 /**
- * RENDERING STRATEGY: Partial Prerendering (PPR) + ISR
+ * RENDERING STRATEGY: Static Site Generation (SSG) + Incremental Static Regeneration (ISR)
  * 
- * This page demonstrates Next.js 16 hybrid rendering:
+ * This page demonstrates Next.js static generation with ISR:
  * 
- * 1. STATIC SECTIONS (Cached with ISR):
- *    - Product details, images, description
- *    - Related products
- *    - Revalidates every 1 hour
+ * 1. SSG (Static Site Generation):
+ *    - Products 1 and 2 are pre-generated at build time
+ *    - Generated via generateStaticParams()
  * 
- * 2. DYNAMIC SECTIONS (Generated on every request):
- *    - Current timestamp (DynamicTime component)
- *    - Uses unstable_noStore() to opt-out of caching
- *    - Wrapped in Suspense for streaming
+ * 2. ISR (Incremental Static Regeneration):
+ *    - All other products are generated on-demand (first request)
+ *    - All pages revalidate every 1 hour (3600 seconds)
+ *    - Stale content served while regenerating in background
  * 
  * BUILD BEHAVIOR:
- * - Build time: Generates static HTML (2 products pre-generated)
- * - Runtime: Serves static content + streams dynamic sections
- * - After 1 hour: ISR revalidates static content in background
+ * - Build time: Generates static HTML for products 1 and 2
+ * - Runtime: On-demand generation for other products
+ * - After 1 hour: Background revalidation for all pages
  * 
  * PERFORMANCE:
- * - Instant page loads (static shell)
- * - Dynamic sections stream in
- * - SEO-friendly (fully rendered)
+ * - Instant page loads (fully static)
+ * - No dynamic rendering overhead
+ * - SEO-friendly (fully rendered HTML)
  */
 
 interface ProductDetailPageProps {
@@ -39,51 +36,13 @@ interface ProductDetailPageProps {
 }
 
 /**
- * Dynamic Time Component
- * This component is NOT cached and updates on every request
- * Demonstrates Partial Prerendering: static page + dynamic sections
- */
-async function DynamicTime() {
-  // Force dynamic rendering - this component will never be cached
-  unstable_noStore();
-  
-  const currentTime = new Date().toLocaleString('en-US', {
-    dateStyle: 'full',
-    timeStyle: 'long',
-  });
-  
-  return (
-    <div style={{
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      padding: '12px 20px',
-      borderRadius: '8px',
-      marginBottom: '20px',
-      color: 'white',
-      fontSize: '14px',
-      fontWeight: '500',
-      textAlign: 'center',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-    }}>
-      🕐 Page generated at: <strong>{currentTime}</strong>
-      <span style={{ 
-        marginLeft: '10px', 
-        fontSize: '12px', 
-        opacity: 0.9 
-      }}>
-        (Dynamic - updates on every refresh)
-      </span>
-    </div>
-  );
-}
-
-/**
  * Fetches a single product by ID
  * ISR: Cached with 1-hour revalidation
  */
 async function getProduct(id: string): Promise<Product | null> {
   try {
     const res = await fetch(`https://dummyjson.com/products/${id}`, {
-      next: { revalidate: 3600 }, // ISR: Revalidate every hour
+      next: { revalidate: 30 }, // ISR: Revalidate every hour
     });
 
     if (!res.ok) {
@@ -114,7 +73,7 @@ async function getRelatedProducts(
     const res = await fetch(
       `https://dummyjson.com/products/category/${category}?limit=10`,
       {
-        next: { revalidate: 3600 }, // ISR: Revalidate every hour
+        next: { revalidate: 30 }, // ISR: Revalidate every hour
       }
     );
 
@@ -177,21 +136,6 @@ export default async function ProductDetailPage({
           <span className={styles.breadcrumbSeparator}>/</span>
           <span className={styles.breadcrumbCurrent}>{product.title}</span>
         </nav>
-
-        {/* Dynamic Time - Updates on every refresh */}
-        <Suspense fallback={
-          <div style={{
-            background: '#f3f4f6',
-            padding: '12px 20px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            textAlign: 'center',
-          }}>
-            Loading time...
-          </div>
-        }>
-          <DynamicTime />
-        </Suspense>
 
         {/* Product Details */}
         <div className={styles.productLayout}>
