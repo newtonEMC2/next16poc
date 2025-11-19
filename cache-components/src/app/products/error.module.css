@@ -1,0 +1,147 @@
+.errorPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.errorContainer {
+  max-width: 600px;
+  width: 100%;
+  background: white;
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.errorIcon {
+  font-size: 5rem;
+  margin-bottom: 1.5rem;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.errorTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212529;
+  margin-bottom: 1rem;
+}
+
+.errorMessage {
+  font-size: 1.125rem;
+  color: #6c757d;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.errorDetails {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: left;
+  border: 1px solid #dee2e6;
+}
+
+.errorSummary {
+  font-weight: 600;
+  color: #495057;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 0.75rem;
+}
+
+.errorSummary:hover {
+  color: #212529;
+}
+
+.errorCode {
+  display: block;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.875rem;
+  color: #dc3545;
+  overflow-x: auto;
+  margin-top: 0.75rem;
+}
+
+.errorDigest {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-family: monospace;
+}
+
+.errorActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.retryBtn,
+.homeBtn {
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.retryBtn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+}
+
+.retryBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.homeBtn {
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.homeBtn:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .errorContainer {
+    padding: 2rem;
+  }
+
+  .errorTitle {
+    font-size: 1.5rem;
+  }
+
+  .errorActions {
+    flex-direction: column;
+  }
+
+  .retryBtn,
+  .homeBtn {
+    width: 100%;
+  }
+}
+
