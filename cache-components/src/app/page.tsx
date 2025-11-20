@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./page.module.css";
 import { Product, ProductsResponse } from "@/types/product";
+import { cacheLife } from "next/cache";
 
 /**
  * RENDERING STRATEGY: Incremental Static Regeneration (ISR)
@@ -32,10 +33,10 @@ import { Product, ProductsResponse } from "@/types/product";
  * └─────────────────────────────────────────────────┘
  */
 async function getFeaturedProducts(): Promise<Product[]> {
+  "use cache";
+  cacheLife("hours");
   try {
-    const res = await fetch("https://dummyjson.com/products?limit=8", {
-      next: { revalidate: 3600 }, // ISR: Revalidate every hour
-    });
+    const res = await fetch("https://dummyjson.com/products?limit=8");
 
     if (!res.ok) {
       throw new Error("Failed to fetch products");
