@@ -20,12 +20,11 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
 
   /**
-   * cacheComponents: false (Temporarily disabled)
+   * cacheComponents: true
    * 
-   * Disabled due to compatibility issues with dynamic ISR pages
-   * Using standard fetch caching with next: { revalidate } instead
-   * 
-   * This resolves hydration errors on dynamically generated pages
+   * Enables Cache Components feature (Next.js 16+)
+   * Allows granular caching control with "use cache" directive
+   * Cache durations can be specified inline using cacheLife()
    */
   cacheComponents: true,
 
