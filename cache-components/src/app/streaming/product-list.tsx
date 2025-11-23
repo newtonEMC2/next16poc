@@ -1,7 +1,9 @@
+import { cacheLife } from 'next/cache';
 import styles from './streaming.module.css';
 
 // Simulate API call to fetch products
 async function fetchProducts() {
+  
   await new Promise((resolve) => setTimeout(resolve, 2000));
   
   return [
@@ -15,6 +17,11 @@ async function fetchProducts() {
 }
 
 export async function ProductList() {
+  "use cache";
+  // cacheLife({stale: 30, revalidate: 60, expire: 300});
+
+  cacheLife({ stale: 60, revalidate: 90, expire: 120 })
+
   const products = await fetchProducts();
   const loadedAt = new Date().toLocaleTimeString();
 
