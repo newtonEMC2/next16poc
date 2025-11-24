@@ -1,9 +1,11 @@
 import { RevalidateButton } from './revalidate-button';
 import styles from './bargains.module.css';
+import { cacheTag } from 'next/cache';
 
 export default async function PriceListPage() {
   // This timestamp is captured at build time (SSG)
   "use cache";
+  cacheTag('bargains');
   const buildTime = new Date().toLocaleString();
   
   return (
@@ -30,6 +32,7 @@ export default async function PriceListPage() {
       </div>
 
       <RevalidateButton />
+      <RevalidateButton expire />
     </div>
   );
 }

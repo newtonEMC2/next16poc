@@ -5,19 +5,22 @@ import { useRouter } from 'next/navigation';
 import styles from './revalidate-button.module.css';
 import { revalidateBargains } from './actions';
 
-export function RevalidateButton() {
+export function RevalidateButton({expire = false}: {expire?: boolean}) {
   const [isRevalidating, setIsRevalidating] = useState(false);
   const [message, setMessage] = useState('');
-  const router = useRouter();
 
   const handleRevalidate = async () => {
     setIsRevalidating(true);
     setMessage('');
 
     try {
-      await revalidateBargains();
-      setMessage('✅ Prices updated!');
-      router.refresh();
+      await revalidateBargains(expire);
+      if (expire) {
+        setMessage('✅ Cache expired! Refreshing...');
+        // router.refresh();
+      } else {
+        setMessage('✅ Cache marked for update on next visit!');
+      }
     } catch (error) {
       setMessage(`❌ Failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
@@ -32,7 +35,7 @@ export function RevalidateButton() {
         disabled={isRevalidating}
         className={styles.button}
       >
-        {isRevalidating ? 'Updating...' : '🔄 Update Prices'}
+        {isRevalidating ? 'Updating...' : `🔄 Update Prices${expire ? ' (Expire)' : ''}`}
       </button>
 
       {message && (
